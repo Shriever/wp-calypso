@@ -9,53 +9,62 @@ import {
 } from '@automattic/calypso-e2e';
 import { Page } from 'playwright';
 
-describe( DataHelper.createSuiteTitle( 'Domains: Add ' ), function () {
-	const phrase = DataHelper.randomPhrase();
-
-	let sidebarComponent: SidebarComponent;
-	let domainSearchComponent: DomainSearchComponent;
-	let cartCheckoutPage: CartCheckoutPage;
+describe( DataHelper.createSuiteTitle( 'Domains: Add to current site' ), function () {
 	let page: Page;
-	let selectedDomain: string;
 
 	setupHooks( ( args ) => {
 		page = args.page;
 	} );
 
-	it( 'Log in', async function () {
-		const loginFlow = new LoginFlow( page );
-		await loginFlow.logIn();
-	} );
+	// Todo: add row for Atomic tests when once #54987 is merged to trunk.
+	// ${ 'Atomic' } | ${ 'wooCommerceUser' } | ${'Free'}
+	describe.each`
+		siteType      | user               | paymentMethod
+		${ 'Simple' } | ${ 'defaultUser' } | ${ 'Credit Card' }
+	`( 'Domains: Add to current site ($siteType)', function ( { user, paymentMethod } ) {
+		e;
+		const phrase = DataHelper.randomPhrase();
 
-	it( 'Navigate to Upgrades > Domains', async function () {
-		sidebarComponent = new SidebarComponent( page );
-		await sidebarComponent.gotoMenu( { item: 'Upgrades', subitem: 'Domains' } );
-	} );
+		let sidebarComponent: SidebarComponent;
+		let domainSearchComponent: DomainSearchComponent;
+		let cartCheckoutPage: CartCheckoutPage;
+		let selectedDomain: string;
 
-	it( 'Click on add domain to this site', async function () {
-		const domainsPage = new DomainsPage( page );
-		await domainsPage.addDomaintoSite();
-	} );
+		it( 'Log in', async function () {
+			const loginFlow = new LoginFlow( page, user );
+			await loginFlow.logIn();
+		} );
 
-	it( 'Search for a domain name', async function () {
-		domainSearchComponent = new DomainSearchComponent( page );
-		await domainSearchComponent.search( phrase );
-	} );
+		it( 'Navigate to Upgrades > Domains', async function () {
+			sidebarComponent = new SidebarComponent( page );
+			await sidebarComponent.gotoMenu( { item: 'Upgrades', subitem: 'Domains' } );
+		} );
 
-	it( 'Choose the .com TLD', async function () {
-		selectedDomain = await domainSearchComponent.selectDomain( '.com' );
-	} );
+		it( 'Click on add domain to this site', async function () {
+			const domainsPage = new DomainsPage( page );
+			await domainsPage.addDomaintoSite();
+		} );
 
-	it( 'Decline G Suite upsell', async function () {
-		await domainSearchComponent.clickButton( 'Skip for now' );
-	} );
+		it( 'Search for a domain name', async function () {
+			domainSearchComponent = new DomainSearchComponent( page );
+			await domainSearchComponent.search( phrase );
+		} );
 
-	it( 'See secure payment', async function () {
-		cartCheckoutPage = new CartCheckoutPage( page );
-		await cartCheckoutPage.selectPaymentMethod( 'Credit Card' );
-	} );
+		it( 'Choose the .com TLD', async function () {
+			selectedDomain = await domainSearchComponent.selectDomain( '.com' );
+		} );
 
-	it( 'Remove domain cart item', async function () {
-		await cartCheckoutPage.removeCartItem( selectedDomain );
+		it( 'Decline G Suite upsell', async function () {
+			await domainSearchComponent.clickButton( 'Skip for now' );
+		} );
+
+		it( 'See secure payment', async function () {
+			cartCheckoutPage = new CartCheckoutPage( page );
+			await cartCheckoutPage.selectPaymentMethod( paymentMethod );
+		} );
+
+		it( 'Remove domain cart item', async function () {
+			await cartCheckoutPage.removeCartItem( selectedDomain );
+		} );
 	} );
 } );
