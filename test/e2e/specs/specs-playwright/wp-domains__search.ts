@@ -22,7 +22,6 @@ describe( DataHelper.createSuiteTitle( 'Domains: Add to current site' ), functio
 		siteType      | user               | paymentMethod
 		${ 'Simple' } | ${ 'defaultUser' } | ${ 'Credit Card' }
 	`( 'Domains: Add to current site ($siteType)', function ( { user, paymentMethod } ) {
-		e;
 		const phrase = DataHelper.randomPhrase();
 
 		let sidebarComponent: SidebarComponent;
@@ -37,7 +36,7 @@ describe( DataHelper.createSuiteTitle( 'Domains: Add to current site' ), functio
 
 		it( 'Navigate to Upgrades > Domains', async function () {
 			sidebarComponent = new SidebarComponent( page );
-			await sidebarComponent.gotoMenu( { item: 'Upgrades', subitem: 'Domains' } );
+			await sidebarComponent.navigate( 'Upgrades', 'Domains' );
 		} );
 
 		it( 'Click on add domain to this site', async function () {
