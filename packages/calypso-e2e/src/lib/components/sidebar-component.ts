@@ -120,7 +120,7 @@ export class SidebarComponent {
 		await this.waitForSidebarInitialization();
 
 		if ( viewportName === 'mobile' ) {
-			await this._openMobileSidebar();
+			await this.openMobileSidebar();
 		}
 
 		await this.page.click( ':text("Switch Site")' );
